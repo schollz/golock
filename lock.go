@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Lock is the structure for containing the lock attributes.
 type Lock struct {
 	name     string
 	f        *os.File
@@ -38,6 +39,9 @@ func OptionSetInterval(interval time.Duration) Option {
 	}
 }
 
+// New creates a new lock with the specified options.
+// If no name is specified with the options, the default name
+// is "golock.lock".
 func New(options ...Option) *Lock {
 	l := new(Lock)
 	l.name = "golock.lock"
@@ -47,6 +51,10 @@ func New(options ...Option) *Lock {
 	return l
 }
 
+// Lock will try to lock by creating a new file. If the file exists, it will
+// throw an error, unless you are using timeouts in which case it will poll until
+// it can create the file. If it is still unable to create the file it will throw
+// an error.
 func (l *Lock) Lock() (err error) {
 	start := time.Now()
 	for {
@@ -71,6 +79,8 @@ func (l *Lock) Lock() (err error) {
 	return
 }
 
+// Unlock will remove the file that it used for locking
+// and throw an error if anything goes wrong.
 func (l *Lock) Unlock() (err error) {
 	if !l.haveLock {
 		return errors.New("no lock")

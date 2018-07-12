@@ -5,7 +5,7 @@
 [![coverage](https://img.shields.io/badge/coverage-97%25-brightgreen.svg)](https://gocover.io/github.com/schollz/golock)
 [![godocs](https://godoc.org/github.com/schollz/golock?status.svg)](https://godoc.org/github.com/schollz/golock) 
 
-Very simple file locking.
+Very simple file locking with optional waiting/timeouts.
 
 
 ## Install
