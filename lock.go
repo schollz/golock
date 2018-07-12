@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type lock struct {
+type Lock struct {
 	name     string
 	f        *os.File
 	haveLock bool
@@ -15,31 +15,31 @@ type lock struct {
 }
 
 // Option is the type all options need to adhere to
-type Option func(l *lock)
+type Option func(l *Lock)
 
 // OptionSetName sets the name
 func OptionSetName(name string) Option {
-	return func(l *lock) {
+	return func(l *Lock) {
 		l.name = name
 	}
 }
 
 // OptionSetTimeout sets the timeout (default: none)
 func OptionSetTimeout(timeout time.Duration) Option {
-	return func(l *lock) {
+	return func(l *Lock) {
 		l.timeout = timeout
 	}
 }
 
 // OptionSetInterval sets the interval to check (default: none)
 func OptionSetInterval(interval time.Duration) Option {
-	return func(l *lock) {
+	return func(l *Lock) {
 		l.interval = interval
 	}
 }
 
-func New(options ...Option) *lock {
-	l := new(lock)
+func New(options ...Option) *Lock {
+	l := new(Lock)
 	l.name = "golock.lock"
 	for _, o := range options {
 		o(l)
@@ -47,7 +47,7 @@ func New(options ...Option) *lock {
 	return l
 }
 
-func (l *lock) Lock() (err error) {
+func (l *Lock) Lock() (err error) {
 	start := time.Now()
 	for {
 		if l.timeout.Nanoseconds() > 0 {
@@ -71,7 +71,7 @@ func (l *lock) Lock() (err error) {
 	return
 }
 
-func (l *lock) Unlock() (err error) {
+func (l *Lock) Unlock() (err error) {
 	if !l.haveLock {
 		return errors.New("no lock")
 	}
