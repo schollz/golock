@@ -9,6 +9,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func BenchmarkLocking(b *testing.B) {
+	os.Remove("testlock")
+	l := New(OptionSetName("testlock"))
+	for i := 0; i < b.N; i++ {
+		l.Lock()
+		l.Unlock()
+	}
+}
+
 func TestLocking(t *testing.T) {
 	os.Remove("testlock")
 
