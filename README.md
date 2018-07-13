@@ -5,16 +5,20 @@
 [![coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://gocover.io/github.com/schollz/golock)
 [![godocs](https://godoc.org/github.com/schollz/golock?status.svg)](https://godoc.org/github.com/schollz/golock) 
 
-Very simple file locking with optional waiting/timeouts.
+Very simple (<100 LOC) file locking with optional timeouts. 
 
 
 ## Install
 
 ```
-go get -u github.com/schollz/golock
+go get github.com/schollz/golock
 ```
 
 ## Usage 
+
+Initialize the lock and then obtain it. If you specify the timeout and interval, it will poll at the given interval for the specified time until it successfully gets a lock, otherwise throw an error. If you don't specify the timeout, then it will throw an error immediately if it does not obtain the lock.
+
+If you get no errors from locking, then you are good to go. Make sure to unlock it when you are done.
 
 ```golang
 // first initiate lockfile
