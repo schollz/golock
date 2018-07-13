@@ -59,13 +59,6 @@ func (l *Lock) Lock() (err error) {
 	start := time.Now()
 	// continually try to lock
 	for {
-		// check if we are using a timeout
-		if l.timeout.Nanoseconds() > 0 {
-			// check if timeout is exceeded and return error
-			if time.Since(start).Nanoseconds() > l.timeout.Nanoseconds() {
-				return errors.New("could not obtain lock, timeout")
-			}
-		}
 		// try to open+create file and error if it already exists
 		l.f, err = os.OpenFile(l.name, os.O_CREATE|os.O_EXCL, 0755)
 		if err != nil {
@@ -81,6 +74,13 @@ func (l *Lock) Lock() (err error) {
 			// and break out of loop
 			l.f.Close()
 			break
+		}
+		// check if we are using a timeout
+		if l.timeout.Nanoseconds() > 0 {
+			// check if timeout is exceeded and return error
+			if time.Since(start).Nanoseconds() > l.timeout.Nanoseconds() {
+				return errors.New("could not obtain lock, timeout")
+			}
 		}
 	}
 	return
