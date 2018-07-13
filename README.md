@@ -42,10 +42,10 @@ if err != nil {
 ## Benchmarks
 
 ```
-goos: windows
+goos: linux
 goarch: amd64
 pkg: github.com/schollz/golock
-BenchmarkLocking-8    5000    302266 ns/op    720 B/op    5 allocs/op
+BenchmarkLocking-4     200000     12224 ns/op    128 B/op    5 allocs/op
 ```
 
 ## Contributing
