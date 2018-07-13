@@ -10,7 +10,6 @@ import (
 type Lock struct {
 	name     string
 	f        *os.File
-	haveLock bool
 	timeout  time.Duration
 	interval time.Duration
 }
@@ -44,6 +43,7 @@ func OptionSetInterval(interval time.Duration) Option {
 // is "golock.lock".
 func New(options ...Option) *Lock {
 	l := new(Lock)
+	// default name of the lock
 	l.name = "golock.lock"
 	for _, o := range options {
 		o(l)
@@ -57,38 +57,37 @@ func New(options ...Option) *Lock {
 // an error.
 func (l *Lock) Lock() (err error) {
 	start := time.Now()
+	// continually try to lock
 	for {
+		// check if we are using a timeout
 		if l.timeout.Nanoseconds() > 0 {
+			// check if timeout is exceeded and return error
 			if time.Since(start).Nanoseconds() > l.timeout.Nanoseconds() {
 				return errors.New("could not obtain lock, timeout")
 			}
 		}
+		// try to open+create file and error if it already exists
 		l.f, err = os.OpenFile(l.name, os.O_CREATE|os.O_EXCL, 0755)
 		if err != nil {
+			// if not using a timeout, return an error
 			if l.timeout.Nanoseconds() == 0 {
 				return errors.New("could not obtain lock")
 			} else {
-				// wait for lock
+				// we are using a timeout, wait for lock
 				time.Sleep(l.interval)
 			}
 		} else {
+			// no error, close file
+			// and break out of loop
+			l.f.Close()
 			break
 		}
 	}
-	l.haveLock = true
 	return
 }
 
 // Unlock will remove the file that it used for locking
-// and throw an error if anything goes wrong.
 func (l *Lock) Unlock() (err error) {
-	if !l.haveLock {
-		return errors.New("no lock")
-	}
-	err = l.f.Close()
-	if err != nil {
-		return
-	}
 	err = os.Remove(l.name)
 	return
 }

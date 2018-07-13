@@ -2,7 +2,7 @@
 
 [![travis](https://travis-ci.org/schollz/golock.svg?branch=master)](https://travis-ci.org/schollz/golock) 
 [![go report card](https://goreportcard.com/badge/github.com/schollz/golock)](https://goreportcard.com/report/github.com/schollz/golock) 
-[![coverage](https://img.shields.io/badge/coverage-97%25-brightgreen.svg)](https://gocover.io/github.com/schollz/golock)
+[![coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://gocover.io/github.com/schollz/golock)
 [![godocs](https://godoc.org/github.com/schollz/golock?status.svg)](https://godoc.org/github.com/schollz/golock) 
 
 Very simple file locking with optional waiting/timeouts.
