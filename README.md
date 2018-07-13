@@ -28,15 +28,16 @@ l := golock.New(
     golock.OptionSetTimeout(60*time.Second),
 )
 
-// use it wherever
-
 // lock it
 err := l.Lock()
 if err != nil {
-    panic(err)
+    // error means we didn't get the lock
+    // handle it
 }
 
-// be sure to unlock it
+// do stuff
+
+// unlock it
 err = l.Unlock()
 if err != nil {
     panic(err)
