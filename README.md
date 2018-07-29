@@ -23,7 +23,7 @@ If you get no errors from locking, then you are good to go. Make sure to unlock 
 ```golang
 // first initiate lockfile
 l := golock.New(
-    "mylockfile", 
+    golocak.OptionSetName("mylockfile"), 
     golock.OptionSetInterval(1*time.Millisecond), 
     golock.OptionSetTimeout(60*time.Second),
 )
