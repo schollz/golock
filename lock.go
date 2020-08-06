@@ -76,7 +76,7 @@ func (l *Lock) Lock() (err error) {
 		} else {
 			// no error, close file
 			// and break out of loop
-			l.f.Close()
+			err = l.f.Close()
 			break
 		}
 		// check if we are using a timeout
@@ -92,6 +92,11 @@ func (l *Lock) Lock() (err error) {
 
 // Unlock will remove the file that it used for locking
 func (l *Lock) Unlock() (err error) {
+	_, err = fs.Stat(l.name)
+	if err != nil {
+		err = nil
+		return
+	}
 	err = fs.Remove(l.name)
 	return
 }

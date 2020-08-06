@@ -1,7 +1,7 @@
 package golock
 
 import (
-	"os"
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -10,7 +10,6 @@ import (
 )
 
 func BenchmarkLocking(b *testing.B) {
-	os.Remove("testlock")
 	l := New(OptionSetName("testlock"))
 	for i := 0; i < b.N; i++ {
 		l.Lock()
@@ -19,13 +18,11 @@ func BenchmarkLocking(b *testing.B) {
 }
 
 func TestLocking(t *testing.T) {
-	os.Remove("testlock")
-
 	l := New(OptionSetName("testlock"))
 	err := l.Lock()
 	assert.Nil(t, err)
 
-	l2 := New(OptionSetName("testlock"))
+	l2 := New(OptionSetName("testlock"), OptionSetInterval(1*time.Millisecond), OptionSetTimeout(100*time.Millisecond))
 	err = l2.Lock()
 	assert.NotNil(t, err)
 
@@ -36,17 +33,13 @@ func TestLocking(t *testing.T) {
 	err = l.Unlock()
 	assert.Nil(t, err)
 
-	err = l2.Unlock()
-	assert.NotNil(t, err)
-
 	err = l2.Lock()
 	assert.Nil(t, err)
-
+	err = l2.Unlock()
+	assert.Nil(t, err)
 }
 
 func TestTimeout(t *testing.T) {
-	os.Remove("golock.lock")
-
 	l1 := New()
 	l2 := New(OptionSetInterval(1*time.Millisecond), OptionSetTimeout(100*time.Millisecond))
 	l1.Lock()
@@ -66,7 +59,6 @@ func TestTimeout(t *testing.T) {
 }
 
 func TestNoTimeout(t *testing.T) {
-	os.Remove("golock.lock")
 	l1 := New()
 	l2 := New(OptionSetInterval(1*time.Millisecond), OptionSetTimeout(100*time.Millisecond))
 	l1.Lock()
@@ -85,24 +77,22 @@ func TestNoTimeout(t *testing.T) {
 	wg.Wait()
 }
 
-// func TestMultiprocessing(t *testing.T) {
-// 	os.Remove("golock.lock")
-// 	var wg sync.WaitGroup
-// 	wg.Add(100)
-// 	for i := 0; i < 100; i++ {
-// 		go func() {
-// 			defer wg.Done()
-// 			time.Sleep(10 * time.Millisecond)
-// 			for j := 0; j < 100; j++ {
-// 				l := New(OptionSetName("lock11"), OptionSetInterval(1*time.Microsecond), OptionSetTimeout(100*time.Second))
-// 				err := l.Lock()
-// 				time.Sleep(500 * time.Microsecond)
-// 				assert.Nil(t, err)
-// 				err = l.Unlock()
-// 				// assert.Nil(t, err)
-// 				fmt.Println("unlocked")
-// 			}
-// 		}()
-// 	}
-// 	wg.Wait()
-// }
+func TestMultiprocessing(t *testing.T) {
+	var wg sync.WaitGroup
+	wg.Add(10)
+	for i := 0; i < 10; i++ {
+		go func(i int) {
+			defer wg.Done()
+			l := New(OptionSetName("lock11"), OptionSetInterval(500*time.Microsecond), OptionSetTimeout(100*time.Second))
+			err := l.Lock()
+			assert.Nil(t, err)
+			time.Sleep(100 * time.Millisecond)
+			err = l.Unlock()
+			if err != nil {
+				fmt.Println(i, err.Error())
+			}
+			assert.Nil(t, err)
+		}(i)
+	}
+	wg.Wait()
+}
