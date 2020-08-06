@@ -4,12 +4,16 @@ import (
 	"errors"
 	"os"
 	"time"
+
+	"github.com/spf13/afero"
 )
+
+var fs = afero.NewMemMapFs()
 
 // Lock is the structure for containing the lock attributes.
 type Lock struct {
 	name     string
-	f        *os.File
+	f        afero.File
 	timeout  time.Duration
 	interval time.Duration
 }
@@ -60,7 +64,7 @@ func (l *Lock) Lock() (err error) {
 	// continually try to lock
 	for {
 		// try to open+create file and error if it already exists
-		l.f, err = os.OpenFile(l.name, os.O_CREATE|os.O_EXCL, 0755)
+		l.f, err = fs.OpenFile(l.name, os.O_CREATE|os.O_EXCL, 0755)
 		if err != nil {
 			// if not using a timeout, return an error
 			if l.timeout.Nanoseconds() == 0 {
@@ -88,6 +92,6 @@ func (l *Lock) Lock() (err error) {
 
 // Unlock will remove the file that it used for locking
 func (l *Lock) Unlock() (err error) {
-	err = os.Remove(l.name)
+	err = fs.Remove(l.name)
 	return
 }

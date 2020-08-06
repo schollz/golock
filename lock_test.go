@@ -29,6 +29,10 @@ func TestLocking(t *testing.T) {
 	err = l2.Lock()
 	assert.NotNil(t, err)
 
+	l3 := New(OptionSetName("testlock3"))
+	err = l3.Lock()
+	assert.Nil(t, err)
+
 	err = l.Unlock()
 	assert.Nil(t, err)
 
