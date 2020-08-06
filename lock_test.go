@@ -1,7 +1,6 @@
 package golock
 
 import (
-	"fmt"
 	"os"
 	"sync"
 	"testing"
@@ -74,7 +73,7 @@ func TestNoTimeout(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
-		time.Sleep(10 * time.Millisecond)
+		time.Sleep(50 * time.Millisecond)
 		l1.Unlock()
 		wg.Done()
 	}()
@@ -86,24 +85,24 @@ func TestNoTimeout(t *testing.T) {
 	wg.Wait()
 }
 
-func TestMultiprocessing(t *testing.T) {
-	os.Remove("golock.lock")
-	var wg sync.WaitGroup
-	wg.Add(100)
-	for i := 0; i < 100; i++ {
-		go func() {
-			defer wg.Done()
-			time.Sleep(10 * time.Millisecond)
-			for j := 0; j < 100; j++ {
-				l := New(OptionSetName("lock11"), OptionSetInterval(1*time.Microsecond), OptionSetTimeout(100*time.Second))
-				err := l.Lock()
-				time.Sleep(500 * time.Microsecond)
-				assert.Nil(t, err)
-				err = l.Unlock()
-				// assert.Nil(t, err)
-				fmt.Println("unlocked")
-			}
-		}()
-	}
-	wg.Wait()
-}
+// func TestMultiprocessing(t *testing.T) {
+// 	os.Remove("golock.lock")
+// 	var wg sync.WaitGroup
+// 	wg.Add(100)
+// 	for i := 0; i < 100; i++ {
+// 		go func() {
+// 			defer wg.Done()
+// 			time.Sleep(10 * time.Millisecond)
+// 			for j := 0; j < 100; j++ {
+// 				l := New(OptionSetName("lock11"), OptionSetInterval(1*time.Microsecond), OptionSetTimeout(100*time.Second))
+// 				err := l.Lock()
+// 				time.Sleep(500 * time.Microsecond)
+// 				assert.Nil(t, err)
+// 				err = l.Unlock()
+// 				// assert.Nil(t, err)
+// 				fmt.Println("unlocked")
+// 			}
+// 		}()
+// 	}
+// 	wg.Wait()
+// }
